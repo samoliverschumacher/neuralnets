@@ -1,1 +1,1 @@
-Main algorithm accepts a combination of layers which are RNNs or normal fully connected layers, and infers how they are connected by looking at the settings defined when the individual layers are created.
+Main algorithm TranSequenceNNetV3.m accepts a combination of layers which are RNNs or normal fully connected layers, and infers how they are connected by looking at the settings defined when the individual layers are created.
