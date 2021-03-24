@@ -9,7 +9,11 @@ Supported features;
 - teacher forcing
 - Attention mechanism for attentional encoder-decoders
 - BiDirectional LSTM
-- ~~Stacked LSTM~~
+
+To be added;
+- Stacked LSTM support
+- batch normalisation
+- parralel computing support
 
 
 The TrainSequenceNNetV3.m allows any combinnation of fully connected & LSTM layers to be input, it can (should) figure out how to connect them together. i.e. FC -> LSTM -> LSTM -> FC or LSTM -> FC, or LSTM -> LSTM. 
@@ -17,4 +21,5 @@ Will try to add examples of how it can be flexible to different configurations, 
 
 See the repository machinelearningprojects/toyProjects/lstmRomannumerals for a working example. 
 
-Please feel free to use & improve!
+This is purely a project for teaching and learning, it's been my education in LSTMs. Please feel free to use & improve!
+FYI - if you just want to use a LSTM in matlab, there are toolboxes that do a much much better job!
