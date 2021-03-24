@@ -14,7 +14,7 @@ To be added;
 - Stacked LSTM support
 - batch normalisation
 - parralel computing support
-
+- Other types of NNet layers: GRU, Convoutional, bayesian neural network!
 
 The TrainSequenceNNetV3.m allows any combinnation of fully connected & LSTM layers to be input, it can (should) figure out how to connect them together. i.e. FC -> LSTM -> LSTM -> FC or LSTM -> FC, or LSTM -> LSTM. 
 Will try to add examples of how it can be flexible to different configurations, and how to do so.
