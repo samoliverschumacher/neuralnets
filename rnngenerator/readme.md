@@ -2,7 +2,7 @@ Main algorithm **TrainSequnceNNetV3.m** accepts a combination of layers which ar
 Supported features;
 - gradient clipping
 - learning rules: SGD, SGD w Learning rate schedule, Momentum, Adam, ~~Adagrad~~, Adadelta
-- Cost functions: Multiclass & Binary Cross-entropy, L2, L1, Weighted binary cross entropy
+- Cost functions: Multiclass & Binary Cross-entropy, L2, L1, Weighted binary cross entropy ([use case](https://samoliverschumacher.github.io/website/post/eeg_costtradeoff/#custom-loss-function---recurrent-neural-network-lstm))
 - Automatic weight initialiser selector (based on activation function)
 - LSTM cell with peephole connections
 - input sequence masking
