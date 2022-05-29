@@ -64,8 +64,8 @@ switch NNLayer.Type
                     [NNLayer.Backward, delXBwd ] = NNPropogate( NNLayer.Backward , Xin_backward , 'backward' , fcn_types , deltaErr_backward , delStateBP_backward , delreccBP_backward);
                     
                     % Error propogated back to Embedding (or prior layer)
-                    %                 d_x = sum( delXFwd , delXBwd , 3);
-                    d_x = mean( cat(4,delXFwd , delXBwd) , 4 ); % to make the erors not as dramatic.
+                    %                 d_x = sum( delXFwd , delXBwd , 3); % Alternative error aggregation
+                    d_x = mean( cat(4,delXFwd , delXBwd) , 4 ); % to make the errors not as large.
                     
                     varargout{1} = d_x;
                     varargout{2} = [];%d_x(:,1,:);
@@ -101,7 +101,7 @@ switch NNLayer.Type
                             NNLayer.curStep = tt;
                             
                             if tt==1 % initialise with prior layers Memory and Hidden States
-                                %%% TRIALLING INITILAISING STATES FROM PRIOR OBSERVATION IN A BATCH
+                                %%% TRIALING - INITILAISING STATES FROM PRIOR OBSERVATION IN A BATCH
                                 if NNLayer.PropBatchinSequence==true && all(smpl>1) % get state from the prior sample in this batch, in the same equivalent timestep
                                     Hin = cat( 1 , ( permute( NNLayer.Activations.HiddenOut( smpl-1 , lastStep ,:) ,[1 3 2]) ) );
                                     memcellIn = cat( 1 , ( permute( NNLayer.Activations.Memory( smpl-1 , lastStep ,:) ,[1 3 2]) ) );
@@ -120,7 +120,7 @@ switch NNLayer.Type
                             
                             if NNLayer.SelfReferencing
                                 
-                                % Could make teacher forced tareget fields obsolete?
+                                % Could make teacher forced target fields obsolete?
                                 if tt==1
                                     TargetVect = cat( 1 , ( permute( DataIN(smpl,tt,:) ,[1 3 2]) ) );
                                 else
@@ -130,7 +130,7 @@ switch NNLayer.Type
                                         
                                         TargetVect = cat( 1 , ( permute( NNLayer.TeacherForcedTarget(smpl,tt,:) ,[1 3 2]) ) );
                                     else % no teacher forcing, use the prior decoder output, as this input.
-                                        % Project Hidden output to a Target Vector by passing it through a Fully Connected layer.
+                                        % Project hidden output to a target vector by passing it through a fully connected layer.
                                         
                                         TargetVect = permute( NNLayer.ProjectionLayerOutput(smpl,tt-1,:) , [1 3 2] );
                                     end
@@ -175,19 +175,15 @@ switch NNLayer.Type
                             end
                             NNLayer.XInput(smpl,tt,:) = permute( Xin_t , [1 3 2] );
                             
-                            %% Sever Synapse!!
+                            %% Sever the Synapse between two neurons!!
                             if NNLayer.Type=="LSTM" && ~NNLayer.SelfReferencing && tt==4 && (size(NNLayer.XInput,2)~=12)
+                                % Uncomment to see what happens to learning reccurance!
                                 %                             memcellIn = memcellIn.*0;
                                 %                             Hin = Hin.*0;
                             end
                             
+                            % Propegate
                             [NNLayer] = LSTMCell( memcellIn , Xin_t , Hin , NNLayer.Weights , fcn_types , NNLayer , tt , smpl );
-                            %                         NNLayer.Activations.Memory(smpl,tt,:) = memcellOut;
-                            %                         NNLayer.Activations.HiddenOut(smpl,tt,:) = hiddenOut;
-                            %                         NNLayer.Activations.Gates.forget(smpl,tt,:) = gates.forget;
-                            %                         NNLayer.Activations.Gates.input(smpl,tt,:) = gates.input;
-                            %                         NNLayer.Activations.Gates.output(smpl,tt,:) = gates.output;
-                            %                         NNLayer.Activations.Gates.activate(smpl,tt,:) = gates.activate;
                             
                             if NNLayer.SelfReferencing
                                 
@@ -211,10 +207,6 @@ switch NNLayer.Type
                     %                 sz_iib = [NNLayer.Nunits , NNLayer.Nunits, btSz];
                     %                 sz_1ib = [ 1 , NNLayer.Nunits, btSz];
                     [NNLayer] = NNClearWeightErrors( NNLayer );
-                    %                 dEdW = struct('wIN', struct('forget',zeros(sz_ijb),'input',zeros(sz_ijb) ,'activate',zeros(sz_ijb) ,'output',zeros(sz_ijb) ) ...
-                    %                     ,'wrec', struct('forget',zeros(sz_iib) ,'input',zeros(sz_iib) ,'activate',zeros(sz_iib) ,'output',zeros(sz_iib) ) ...
-                    %                     ,'wb', struct('forget',zeros(sz_1ib) ,'input',zeros(sz_1ib) ,'activate',zeros(sz_1ib) ,'output',zeros(sz_1ib) ) ...
-                    %                     ,'wpeep', struct('forget',zeros(sz_iib) ,'input',zeros(sz_iib) ,'output',zeros(sz_iib) ) );
                     
                     sz_bsu = zeros( btSz , NNLayer.Nstates , NNLayer.Nunits );
                     
@@ -296,7 +288,7 @@ switch NNLayer.Type
                         state_t = permute( NNLayer.Activations.Memory(:,tt,:) ,[1 3 2]);
                         
                         d_out(:, 1 ,:) = delErr(:,1,:) + delout(:,tt,:);  % Error passed from previous (future) reccurnt unit + Error of This units output to target.
-                        if tt== lastStep%NNLayer.Nstates % There is no future cell state to backpropogate to this time step.
+                        if tt == lastStep % NNLayer.Nstates % There is no future cell state to backpropogate to this time step.
                             d_state(:,tt,:) = d_out(:, 1 ,:) .* NNLayer.Activations.Gates.output(:,tt,:) ...
                                 .* permute( Actvfcn( state_t , true , fcn_types.(NNLayer.ActFcn) ), [1 3 2] );
                             if exist('delState_bp','var')
